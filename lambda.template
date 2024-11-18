@@ -1,0 +1,51 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "",
+  "Resources" : {
+     "LambdaWriteS3": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "LambdaWriteS3",
+        "Handler": "index.handler",
+        "Role": { "Fn::GetAtt": ["RoleLambdaS3", "Arn"] },
+        "Code": {
+          "S3Bucket": "my-code-bucket",
+          "S3Key": "my-lambda-code.zip"
+        },
+        "Runtime": "python3.8"
+      }
+    },
+    "RoleLambdaS3": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "S3WritePolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "s3:PutObject",
+                  "Resource": "arn:aws:s3:::my-bucket/data/*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
